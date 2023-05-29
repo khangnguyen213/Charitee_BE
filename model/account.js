@@ -7,7 +7,11 @@ const accountSchema = new mongoose.Schema({
   phone: { type: String },
   address: { type: String },
   role: { type: String, enum: ["master", "admin", "user"], default: "user" },
-  status: { type: String, enum: ["active", "inactive"], default: "active" },
+  status: {
+    type: String,
+    enum: ["pending", "active", "inactive"],
+    default: "pending",
+  },
 });
 
 module.exports = mongoose.model("Account", accountSchema);

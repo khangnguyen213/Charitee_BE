@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 
 const donationSchema = new mongoose.Schema({
-  account: {
+  accountID: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Account",
   },
-  cause: {
+  causeID: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Cause",
   },
