@@ -32,37 +32,37 @@ app.use(
 );
 
 // Set up session management middleware
-// app.use(
-//   session({
-//     secret: "my secret",
-//     resave: false,
-//     saveUninitialized: false,
-//     cookie: { sameSite: "none", secure: true, maxAge: 1000 * 60 * 60 },
-//     store: store,
-//   })
-// );
-
 app.use(
   session({
-    // Secret used to sign the session ID cookie
     secret: "my secret",
-    // Disable automatic session storage when changes aren't made
     resave: false,
-    // Prevent creating a new session if no changes are made
     saveUninitialized: false,
-    // Set options object for the session middleware cookie
-    cookie: {
-      // Set sameSite attribute to lax to allow cross-site requests
-      sameSite: "lax",
-      // Disable HTTPS requirement
-      secure: false,
-      // Set maximum age to 1 hour
-      maxAge: 1000 * 60 * 60,
-    },
-    // Store session data in external store
+    cookie: { sameSite: "none", secure: true, maxAge: 1000 * 60 * 60 },
     store: store,
   })
 );
+
+// app.use(
+//   session({
+//     // Secret used to sign the session ID cookie
+//     secret: "my secret",
+//     // Disable automatic session storage when changes aren't made
+//     resave: false,
+//     // Prevent creating a new session if no changes are made
+//     saveUninitialized: false,
+//     // Set options object for the session middleware cookie
+//     cookie: {
+//       // Set sameSite attribute to lax to allow cross-site requests
+//       sameSite: "lax",
+//       // Disable HTTPS requirement
+//       secure: false,
+//       // Set maximum age to 1 hour
+//       maxAge: 1000 * 60 * 60,
+//     },
+//     // Store session data in external store
+//     store: store,
+//   })
+// );
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
