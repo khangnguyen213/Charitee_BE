@@ -24,7 +24,7 @@ app.use(
   cors({
     // Allow requests from http://localhost:3000
     // origin: "http://localhost:3000",
-    origin: "https://melodic-narwhal-4c7c0a.netlify.app",
+    origin: "https://charitee-rj-tw.netlify.app",
     // Allow POST, PUT, GET, OPTIONS, and HEAD methods
     methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD", "DELETE"],
     // Allow credentials to be passed with requests
