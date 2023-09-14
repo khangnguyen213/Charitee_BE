@@ -124,6 +124,7 @@ accountRouter.route("/login").post(accountController.login);
 
 accountRouter.route("/logout").get(accountController.logout);
 
+// Mount the routers onto the app
 app.use("/cause", causeRouter);
 app.use("/account", accountRouter);
 
@@ -133,10 +134,6 @@ app.get("/donations", donationController.getDonation);
 app.post("/payment/create-payment", donationController.createPayment);
 
 app.post("/payment/execute-payment", donationController.executePayment);
-
-// Mount the routers onto the app
-app.use("/cause", causeRouter);
-app.use("/account", accountRouter);
 
 mongoose
   .connect(mongodbURL)
