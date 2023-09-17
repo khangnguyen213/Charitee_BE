@@ -138,6 +138,9 @@ app.post('/payment/create-payment', donationController.createPayment);
 
 app.post('/payment/execute-payment', donationController.executePayment);
 
+app.use('/cause', causeRouter);
+app.use('/account', accountRouter);
+
 mongoose
   .connect(mongodbURL)
   .then((result) => {
