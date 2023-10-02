@@ -1,10 +1,10 @@
-const Account = require("../model/account");
+const Account = require('../model/account');
 
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 // SENDGRID
-const sgMail = require("@sendgrid/mail");
+const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API);
 
 // CHECK SESSION
@@ -26,8 +26,8 @@ exports.checkAdmin = ({ session }, res, next) => {
   console.log(role);
   // Check if the role is "admin" or "master"
   switch (role) {
-    case "admin":
-    case "master":
+    case 'admin':
+    case 'master':
       // If the role is "admin" or "master", call the next middleware function
       return next();
     default:
@@ -55,11 +55,11 @@ exports.getAccount = (req, res, next) => {
   // If a keyword is provided, search accounts based on specified terms
   if (req.query.keyword) {
     // Check if user is authorized to view account list
-    if (!["admin", "master"].includes(req.session.account?.role)) {
+    if (!['admin', 'master'].includes(req.session.account?.role)) {
       return res.sendStatus(403);
     }
     // Create regular expression that ignores case of searched terms
-    const keywordRegEx = new RegExp(req.query.keyword, "i");
+    const keywordRegEx = new RegExp(req.query.keyword, 'i');
     // Set up search conditions for phone, fullname, and email fields
     findOpts.$or = [
       { phone: { $regex: keywordRegEx } },
@@ -77,10 +77,10 @@ exports.getAccount = (req, res, next) => {
   const findPromise = Account.find(
     {
       ...findOpts,
-      status: { $in: ["active"] },
+      status: { $in: ['active'] },
     },
     //Only return these value (not include password)
-    "email fullname phone address role"
+    'email fullname phone address role'
   )
     //skip a number of documents
     .skip(skip)
@@ -90,7 +90,7 @@ exports.getAccount = (req, res, next) => {
   //Promise to count the total satisfied documents
   const countPromise = Account.countDocuments({
     ...findOpts,
-    status: { $in: ["active"] },
+    status: { $in: ['active'] },
   });
 
   // Retrieve results from both findPromise and countPromise
@@ -102,6 +102,7 @@ exports.getAccount = (req, res, next) => {
         currentPage: pageNumber > 0 ? pageNumber : 1,
         totalPage: Math.ceil(count / nPerPage),
         accounts: results,
+        count,
       };
       return res.send(responseDate);
     })
@@ -124,8 +125,8 @@ async function sendEmail(account) {
     await sgMail.send({
       to: account.email,
       from: process.env.SENDER_EMAIL,
-      subject: "Verify your registration",
-      templateId: "d-b63496460c45454a9b31a8d20ea9ac82",
+      subject: 'Verify your registration',
+      templateId: 'd-b63496460c45454a9b31a8d20ea9ac82',
       dynamicTemplateData: template_data,
     });
   } catch (error) {
@@ -142,7 +143,7 @@ exports.addAccount = async (req, res, next) => {
     if (existingAccount) {
       // Return a 402 status code if the email is already taken
       res.statusCode = 402;
-      res.statusMessage = "This email already exists";
+      res.statusMessage = 'This email already exists';
       return res.end();
     }
 
@@ -155,7 +156,7 @@ exports.addAccount = async (req, res, next) => {
 
     // Throw an error if the account wasn't saved successfully
     if (!savedAccount) {
-      throw new Error("Failed to create account");
+      throw new Error('Failed to create account');
     }
 
     // Send a verification email to the newly created account
@@ -176,12 +177,12 @@ exports.verifyAccount = async (req, res) => {
     const account = await Account.findById(accountID);
 
     // Return a 404 error if the account doesn't exist or is not pending
-    if (!account || account.status !== "pending") {
+    if (!account || account.status !== 'pending') {
       return res.sendStatus(404);
     }
 
     // Activate the account and save it to the database
-    account.status = "active";
+    account.status = 'active';
     await account.save();
 
     // Return a 200 status code on success
@@ -217,7 +218,7 @@ exports.updateAccount = async (req, res) => {
 
     // Throw an error if the account wasn't saved successfully
     if (!savedAccount) {
-      throw new Error("Failed to update account");
+      throw new Error('Failed to update account');
     }
 
     // Send a success response with the updated account data
@@ -236,10 +237,10 @@ exports.requestResetPassword = async (req, res) => {
     const account = await Account.findOne({ email: req.body.email });
     if (!account) {
       // If no such document exists, send a 404 response
-      return res.status(404).send("Email not found");
+      return res.status(404).send('Email not found');
     }
     // Generate a JSON Web Token (JWT) containing the account's ID
-    const token = jwt.sign({ _id: account._id }, "secret-key", {
+    const token = jwt.sign({ _id: account._id }, 'secret-key', {
       expiresIn: 60 * 10, // Token expires in 10 minutes
     });
     // Define the data to be included in the email template
@@ -250,9 +251,9 @@ exports.requestResetPassword = async (req, res) => {
     // Use SendGrid to send an email to the account's email address
     await sgMail.send({
       to: account.email,
-      from: "khangnguyeniz1010@gmail.com",
-      subject: "Reset Password Confirmation",
-      templateId: "d-8f56f1660ba647218fb88965927ae376",
+      from: 'khangnguyeniz1010@gmail.com',
+      subject: 'Reset Password Confirmation',
+      templateId: 'd-8f56f1660ba647218fb88965927ae376',
       dynamicTemplateData: template_data,
     });
     // If the email is sent successfully, send a 200 response
@@ -267,18 +268,18 @@ exports.requestResetPassword = async (req, res) => {
 exports.verifyResetPassword = async (req, res) => {
   try {
     // Verify JWT token
-    const payload = jwt.verify(req.body.token, "secret-key");
+    const payload = jwt.verify(req.body.token, 'secret-key');
     // Find account by ID from token payload
     const account = await Account.findById(payload._id);
     if (!account) {
       // If account not found, return 404
-      return res.status(404).send("This link has expired");
+      return res.status(404).send('This link has expired');
     }
     // Check if new password is same as old password
     if (bcrypt.compareSync(req.body.password, account.password)) {
       return res
         .status(406)
-        .send("The new password is the same as the old one");
+        .send('The new password is the same as the old one');
     }
     // Hash new password and save it to account
     account.password = bcrypt.hashSync(req.body.password, 12);
@@ -288,7 +289,7 @@ exports.verifyResetPassword = async (req, res) => {
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
       // Handle expired token error
-      return res.status(404).send("This link has expired");
+      return res.status(404).send('This link has expired');
     } else {
       // Handle other errors
       return res.sendStatus(500);
@@ -299,7 +300,7 @@ exports.verifyResetPassword = async (req, res) => {
 // DELETE ACCOUNT
 exports.deleteAccount = (req, res) => {
   // Update account whose IDs are included in the request body to have a status of "inactive"
-  Account.updateMany({ _id: { $in: req.body } }, { status: "inactive" }).then(
+  Account.updateMany({ _id: { $in: req.body } }, { status: 'inactive' }).then(
     (data) => {
       // If any accounts were successfully updated, send a response with a success status code and message
       if (data.modifiedCount > 0) {
@@ -316,17 +317,17 @@ exports.deleteAccount = (req, res) => {
 exports.changeRole = (req, res) => {
   // If the currently authenticated user's role is not "master", send a 401 status code
   // Only master can change role
-  if (req.session.account.role !== "master") {
+  if (req.session.account.role !== 'master') {
     return res.sendStatus(401);
   }
 
   let updatedRole;
   // Determine the updated role based on the value of the "role" property in the request body
-  if (req.body.role === "admin") {
-    updatedRole = "user";
-  } else if (req.body.role === "user") {
-    updatedRole = "admin";
-  } else if (req.body.role === "master") {
+  if (req.body.role === 'admin') {
+    updatedRole = 'user';
+  } else if (req.body.role === 'user') {
+    updatedRole = 'admin';
+  } else if (req.body.role === 'master') {
     // If the requested role update is for a "master" role, send a 403 status code and error message
     return res.status(403).send("Master's role cannot be updated");
   }
@@ -356,7 +357,7 @@ exports.login = async (req, res) => {
     // If an account is found and its password matches the hash in the database
     if (result && bcrypt.compareSync(req.body.password, result.password)) {
       // If the account's status is "active"
-      if (result.status === "active") {
+      if (result.status === 'active') {
         // Set the account information as the value of the "account" key in the session object
         req.session.account = result;
 
@@ -370,15 +371,15 @@ exports.login = async (req, res) => {
       }
 
       // If the account's status is "pending"
-      if (result.status === "pending") {
+      if (result.status === 'pending') {
         // Send a response indicating that the account is pending and needs email verification
         return res
           .status(403)
-          .send("This account is pending. Please verify your email");
+          .send('This account is pending. Please verify your email');
       }
     } else {
       // If no account is found or the passwords don't match, throw an error
-      throw new Error("Email or Password not correct");
+      throw new Error('Email or Password not correct');
     }
   } catch (err) {
     // If there is an error, return a 401 status code and the error message as a string

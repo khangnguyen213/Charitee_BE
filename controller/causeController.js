@@ -1,4 +1,4 @@
-const Cause = require("../model/cause");
+const Cause = require('../model/cause');
 
 // GET CAUSE
 exports.getCause = (req, res) => {
@@ -12,7 +12,7 @@ exports.getCause = (req, res) => {
   // If there is a keyword in the query parameters, construct a regex to search
   // for titles and descriptions that match that keyword.
   if (req.query.keyword) {
-    const keywordRegEx = new RegExp(req.query.keyword, "i");
+    const keywordRegEx = new RegExp(req.query.keyword, 'i');
     findOpts.$or = [
       { title: { $regex: keywordRegEx } },
       { description: { $regex: keywordRegEx } },
@@ -39,7 +39,7 @@ exports.getCause = (req, res) => {
   //promise to find documents base on findOpts
   const findPromise = Cause.find({
     ...findOpts,
-    status: { $in: ["active", "finished"] },
+    status: { $in: ['active', 'finished'] },
   })
     .sort({ createdAt: -1 }) // Sort by createdAt field in descending order (-1)
     .skip(skip)
@@ -48,7 +48,7 @@ exports.getCause = (req, res) => {
   //promise to count documents base on findOpts
   const countPromise = Cause.countDocuments({
     ...findOpts,
-    status: { $in: ["active", "finished"] },
+    status: { $in: ['active', 'finished'] },
   });
 
   //handle both find and count promise and response
@@ -59,6 +59,7 @@ exports.getCause = (req, res) => {
         currentPage: pageNumber > 0 ? pageNumber : 1,
         totalPage: Math.ceil(count / nPerPage),
         causes: results,
+        count,
       };
       return res.send(responseDate);
     })
@@ -140,7 +141,7 @@ exports.updateCause = (req, res) => {
 // DELETE CAUSE
 exports.deleteCause = (req, res) => {
   //find causes base on req.body, delete them by change status to inactive
-  Cause.updateMany({ _id: { $in: req.body } }, { status: "inactive" }).then(
+  Cause.updateMany({ _id: { $in: req.body } }, { status: 'inactive' }).then(
     (data) => {
       if (data.modifiedCount > 0) {
         return res.status(200).send(`Updated ${data.modifiedCount} item(s)`);

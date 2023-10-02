@@ -23,7 +23,7 @@ app.set('trust proxy', 1);
 app.use(
   cors({
     // Allow requests from http://localhost:3000
-    // origin: "http://localhost:3000",
+    // origin: 'http://localhost:3000',
     origin: [
       'https://charitee-rj-tw.netlify.app',
       'https://charitee-fe.vercel.app',
@@ -49,7 +49,7 @@ app.use(
 // app.use(
 //   session({
 //     // Secret used to sign the session ID cookie
-//     secret: "my secret",
+//     secret: 'my secret',
 //     // Disable automatic session storage when changes aren't made
 //     resave: false,
 //     // Prevent creating a new session if no changes are made
@@ -57,7 +57,7 @@ app.use(
 //     // Set options object for the session middleware cookie
 //     cookie: {
 //       // Set sameSite attribute to lax to allow cross-site requests
-//       sameSite: "lax",
+//       sameSite: 'lax',
 //       // Disable HTTPS requirement
 //       secure: false,
 //       // Set maximum age to 1 hour
@@ -137,9 +137,6 @@ app.get('/donations', donationController.getDonation);
 app.post('/payment/create-payment', donationController.createPayment);
 
 app.post('/payment/execute-payment', donationController.executePayment);
-
-app.use('/cause', causeRouter);
-app.use('/account', accountRouter);
 
 mongoose
   .connect(mongodbURL)
